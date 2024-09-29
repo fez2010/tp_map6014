@@ -1,2 +1,3 @@
 #!/bin/bash
-sh ./font_setup.sh
+sh setup/ubuntu/font_setup.sh
+sh setup/ubuntu/libs.sh

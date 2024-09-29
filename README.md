@@ -36,11 +36,13 @@ python -m bash_kernel.install
 #### Mac os
 `sh setup/macos/font_setup.sh` 
 ## Lancer le code source
-`jupyter execute TP_MAP6009.ipynb --allow-errors`
+`Make open`
 ## Resultats obtenus
-
+## Avant le build
+`Make dep`
 ## Build
-`Make`
+Vous pouvez build le model, pdf...
+`Make build`
 ## Références
 * [venv installations and kernel creation](https://medium.com/@WamiqRaza/how-to-create-virtual-environment-jupyter-kernel-python-6836b50f4bf4)
 * [Theme](./theme/AdobeColor-My%20Color%20Theme-3.jpeg)
