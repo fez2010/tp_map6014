@@ -22,7 +22,7 @@ Prédiction du risque de départ d'un employer a l'aide du dataset [turnover.csv
 conda install jupyter
 conda install ipython
 conda install ipykernel
-conda install bash_kernel
+pip install bash_kernel
 ```
 ### Créer et installer un nouveau kernel jupyter 
 ```
@@ -31,7 +31,7 @@ python -m ipykernel install --user --name=tp_map6014
 python -m bash_kernel.install
 ```
 ## Lancer le code source
-``
+`jupyter execute TP_MAP6009.ipynb --allow-errors`
 ## Resultats obtenus
 
 ## Références
