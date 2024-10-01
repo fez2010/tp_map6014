@@ -32,19 +32,27 @@ from pathlib import Path
 
 import os
 
+import platform
 
 
 
+
+
+
+
+print(platform.machine(), platform.system(),platform.node(), platform.python_version(), platform.python_compiler(), platform.architecture())
 
 
 
 mpl.set_loglevel("debug")
 
-font_paths = mpl.font_manager.findSystemFonts()
+if platform.system() == 'Linux':
 
-for font_file in font_paths:
+  font_paths = mpl.font_manager.findSystemFonts()
 
-  mpl.font_manager.fontManager.addfont(font_file)
+  for font_file in font_paths:
+
+    mpl.font_manager.fontManager.addfont(font_file)
 
 
 
@@ -58,6 +66,8 @@ plt.rcParams['figure.figsize'] = (3.1, 3)
 
 
 
+
+
 sns.set_theme(style="white", rc={"grid.linewidth": 0.1, 'figure.figsize':(3.1,3)})
 
 sns.set_style("ticks")
@@ -66,11 +76,29 @@ sns.set(font='Arial')
 
 sns.set_context("paper", font_scale=0.9)
 
-plt.figure(figsize=(3.1, 3))
+#plt.figure(figsize=(3.1, 3))
 
 #sns.despine(left=False, bottom=False)
 
 
+
+
+
+def in_ggole_colab():
+
+  return os.getenv("COLAB_RELEASE_TAG") != None
+
+def set_title(fig, title):
+
+  if(in_ggole_colab()):
+
+    fig.set_title(title)
+
+def title(fig, title):
+
+  if(in_ggole_colab()):
+
+    fig.title(title)
 
 def save_figure(fig,name):
 
@@ -94,7 +122,7 @@ def save_figure(fig,name):
 
   for i in range(len(prefixs)):
 
-    fig.savefig(f'{prefixs[i]}{name}.{prefixs_names[i]}', format=prefixs_names[i], bbox_inches='tight', dpi=300)
+    fig.savefig(f'{prefixs[i]}{name}.{prefixs_names[i]}', format=prefixs_names[i], bbox_inches='tight', dpi=96)
 
 
 
@@ -124,7 +152,9 @@ datasets[0].head()
 
 
 
-# Creation des ensembles de nom
+
+
+# Création des ensembles de nom
 
 CATEGORY_COLUMNS= ['Industry', 'Profession','Traffic', 'Coach', 'Head_gender','Greywage','Way','Gender']
 
@@ -182,7 +212,13 @@ def get_description(dataset):
 
 print(get_description(datasets[1]))
 
-stats.normaltest(datasets[1][TARGET])
+#stats.normaltest(datasets[1][TARGET])
+
+Path("./outputs/csv/").mkdir(parents=True, exist_ok=True)
+
+get_description(datasets[1]).to_csv('./outputs/csv/stats.csv')
+
+
 
 
 
@@ -206,13 +242,13 @@ with sns.axes_style("ticks"):
 
   plt.tight_layout()
 
-  plt.title('Répartition des données par classes')
 
-  plt.show()
 
   save_figure(plt, 'dataset_pie_chart')
 
+  title(plt,'Répartition des données par classes')
 
+  plt.show()
 
 
 
@@ -220,7 +256,7 @@ with sns.axes_style("ticks"):
 
 with sns.axes_style("ticks"):
 
-  for column in INTEGER_QUANTITATIVE_COLUMNS:
+  for column in INTEGER_QUANTITATIVE_COLUMNS + CATEGORY_COLUMNS:
 
     splot = sns.displot(
 
@@ -230,7 +266,7 @@ with sns.axes_style("ticks"):
 
         multiple="stack",
 
-        palette=COLOR_PALETTE,
+        palette=COLOR_PALETTE[0:1],
 
         edgecolor=".3",
 
@@ -256,11 +292,21 @@ with sns.axes_style("ticks"):
 
     splot.ax.set_xlabel("")
 
-    splot.ax.set_title(f"Distribution des valeurs de la colonne {column}")
+    #splot.ax.set_title(f"Distribution des valeurs de la colonne {column}")
+
+    save_figure(splot, f'distribution_{column}')
+
+    set_title(splot.ax,f'Distribution des valeurs de la colonne {column}')
 
     plt.show()
 
-    save_figure(splot, f'distribution_{column}')
+
+
+
+
+
+
+
 
 
 
@@ -286,11 +332,15 @@ with sns.axes_style("ticks"):
 
     splot.ax.set_xlabel("")
 
-    splot.ax.set_title(f"Distribution de la densité des valeurs de la colonne {column}")
+    #splot.ax.set_title(f"Distribution de la densité des valeurs de la colonne {column}")
+
+    save_figure(splot, f'density_distribution_{column}')
+
+    set_title(splot.ax,f'Distribution de la densité des valeurs de la colonne {column}')
 
     plt.show()
 
-    save_figure(splot, f'density_distribution_{column}')
+
 
 
 
@@ -312,11 +362,13 @@ with sns.axes_style("ticks"):
 
   plt.xticks(rotation=90)
 
-  plt.title('Identification des colonnes présentant des anomalies')
+  save_figure(plt, f'main_boxplot_show_outlier_columns')
+
+  title(plt,'Identification des colonnes présentant des anomalies')
 
   plt.show()
 
-  save_figure(plt, f'main_boxplot_show_outlier_columns')
+
 
 
 
@@ -330,21 +382,25 @@ IQR_dataset = b.copy()
 
 columns = ['Stag','Age']
 
+REMOVED_COLUMNS_INDEX = []
+
 with sns.axes_style("ticks"):
 
       IQR_dataset[columns].boxplot(figsize=(3.1, 3))
 
       plt.xticks(rotation=90)
 
+      save_figure(plt, f'boxplot_show_outlier_column_{column}')
+
       plt.show()
 
-      save_figure(plt, f'boxplot_show_outlier_column_{column}')
+
 
 def remove_outliers(IQR_dataset, columns):
 
   for column in columns:
 
-    # IQR
+    # EIQ
 
     Q1 = np.percentile(IQR_dataset[column], 25, method='midpoint')
 
@@ -352,29 +408,29 @@ def remove_outliers(IQR_dataset, columns):
 
     IQR = Q3 - Q1
 
-    print(f"IQR de la colonne {column} ", IQR)
+    print(f"EIQ de la colonne {column} ", IQR)
 
 
 
-    # Limite superieur
+    # Limite supérieur
 
     upper = Q3+1.5*IQR
 
     upper_array = np.array(IQR_dataset[column] >= upper)
 
-    print(f"Limite superieur de la colonne {column}:", upper)
+    print(f"Limite supérieur de la colonne {column}:", upper)
 
     print(upper_array.sum())
 
 
 
-    # Limite inferieur
+    # Limite inférieur
 
     lower = Q1-1.5*IQR
 
     lower_array = np.array(IQR_dataset[column] <= lower)
 
-    print(f"Limite inferieur de la colonne {column}:", lower)
+    print(f"Limite inférieur de la colonne {column}:", lower)
 
     print(lower_array.sum())
 
@@ -382,7 +438,7 @@ def remove_outliers(IQR_dataset, columns):
 
 
 
-    # Creation du tableau Boolean indiquant les lignes ayant des outliers
+    # Création du tableau Boolean indiquant les lignes ayant des outliers
 
     upper_array = np.where(IQR_dataset[column] >= upper)[0]
 
@@ -394,15 +450,19 @@ def remove_outliers(IQR_dataset, columns):
 
       plt.xticks(rotation=90)
 
-      plt.axhline(upper, color='red', linestyle='--', label='Limite superieur')
+      plt.axhline(upper, color='red', linestyle='--', label="Limites")
 
-      plt.axhline(lower, color='red', linestyle='--', label='Limite inferieur')
+      plt.axhline(lower, color='red', linestyle='--', )
 
-      plt.legend()
+      save_figure(plt, f'boxplot_show_outlier_column_{column}')
 
       plt.show()
 
-      save_figure(plt, f'boxplot_show_outlier_column_{column}')
+
+
+    REMOVED_COLUMNS_INDEX = np.concatenate((upper_array, lower_array))
+
+    REMOVED_COLUMNS_INDEX = np.unique(np.array(REMOVED_COLUMNS_INDEX.tolist(), dtype=np.int16)).tolist()
 
     # Suppression des outliers
 
@@ -411,6 +471,8 @@ def remove_outliers(IQR_dataset, columns):
     IQR_dataset.drop(index=lower_array, inplace=True)
 
     IQR_dataset.reset_index(drop=True, inplace=True)
+
+
 
     # Afficher la nouvelle taille du  DataFrame
 
@@ -432,9 +494,11 @@ with sns.axes_style("ticks"):
 
       plt.xticks(rotation=90)
 
+      save_figure(plt, f'boxplot_show_outlier_removed_on_columns')
+
       plt.show()
 
-      save_figure(plt, f'boxplot_show_outlier_removed_on_columns')
+
 
 
 
@@ -446,9 +510,11 @@ with sns.axes_style("ticks"):
 
   #plt.tight_layout()
 
+  save_figure(plt, f'main_boxplot_show_outlier_removed_on_columns')
+
   plt.show()
 
-  save_figure(plt, f'main_boxplot_show_outlier_removed_on_columns')
+
 
 
 
@@ -472,11 +538,9 @@ with sns.axes_style("ticks"):
 
   plt.box(False)
 
-  plt.show()
-
   save_figure(plt, 'corr_heatmap_after_removing_outlier')
 
-
+  plt.show()
 
 
 
@@ -503,6 +567,10 @@ age_threshold_z = datasets[1]['Age'].std() * 2.8
 outlier_indices = np.where(ZScore_dataset['Stag'] > 2.2)[0]
 
 print(outlier_indices)
+
+REMOVED_COLUMNS_INDEX  = np.concatenate((REMOVED_COLUMNS_INDEX, outlier_indices))
+
+REMOVED_COLUMNS_INDEX = np.unique(np.array(REMOVED_COLUMNS_INDEX.tolist(), dtype=np.int16)).tolist()
 
 no_outliers = ZScore_dataset.drop(outlier_indices)
 
@@ -531,6 +599,10 @@ threshold_z = 2.8
 outlier_indices = np.where(no_outliers['Age'] > threshold_z)[0]
 
 print(outlier_indices, )
+
+REMOVED_COLUMNS_INDEX  = np.concatenate((REMOVED_COLUMNS_INDEX, outlier_indices))
+
+REMOVED_COLUMNS_INDEX = np.unique(np.array(REMOVED_COLUMNS_INDEX.tolist(), dtype=np.int16)).tolist()
 
 no_outliers_2 = no_outliers.drop(outlier_indices)
 
@@ -576,9 +648,11 @@ with sns.axes_style("ticks"):
 
   plt.box(False)
 
+  save_figure(plt, 'corr_heatmap_after_removing_outlier_2')
+
   plt.show()
 
-  plt.savefig('out_main_headmap.png')
+
 
 
 
@@ -606,7 +680,23 @@ assert IQR_dataset.shape[1] == no_outliers_2.shape[1] == datasets[1].shape[1] - 
 
 
 
-ACP_dataset = IQR_dataset.copy()
+# IQR_dataset ou ...
+
+ACP_dataset = datasets[1].copy()
+
+ACP_dataset.drop(index=REMOVED_COLUMNS_INDEX, inplace=True)
+
+ACP_dataset.reset_index(drop=True, inplace=True)
+
+ACP_dataset.shape
+
+
+
+scaler = StandardScaler()
+
+f_scaler = scaler
+
+ACP_dataset[EXPLICATIVES_COLUMNS] = scaler.fit_transform(ACP_dataset[EXPLICATIVES_COLUMNS])
 
 
 
@@ -615,6 +705,10 @@ def generate_components_short_names(n):
   return [f'C{i+1}' for i in range(n)]
 
 
+
+print(np.linalg.det(ACP_dataset[EXPLICATIVES_COLUMNS].corr().to_numpy()) *
+
+      np.linalg.det(np.transpose(np.linalg.inv(ACP_dataset[EXPLICATIVES_COLUMNS].corr().to_numpy()))))
 
 # Créer un objet PCA
 
@@ -704,9 +798,9 @@ with sns.axes_style("ticks"):
 
   plt.axvline(0, color='black', linewidth=0.5)
 
-  plt.show()
-
   save_figure(plt, f'variable_contribution_to_composent_one_and_two')
+
+  plt.show()
 
 
 
@@ -724,9 +818,11 @@ with sns.axes_style("ticks"):
 
   plt.grid(color='gray', linestyle='--', linewidth=0.5)
 
-  plt.show()
+
 
   save_figure(plt, f'bar_show_prinpal_components')
+
+  plt.show()
 
   # Visualisation des valeurs propres
 
@@ -742,15 +838,17 @@ with sns.axes_style("ticks"):
 
   plt.grid(color='gray', linestyle='--', linewidth=0.5)
 
+
+
+  save_figure(plt, f'bar_show_principal_component_column_s')
+
   plt.show()
 
-  save_figure(plt, f'bar_show_principal_component_column_{column}')
+imp = pd.DataFrame(data = { 'TVE': eigenvalues, 'PVTE': explained_variance*100, 'CumPVTE': np.cumsum(explained_variance*100) },  index=generate_components_short_names(len(eigenvalues)))
 
-pd.DataFrame(data = { 'TVE': eigenvalues, 'PVTE': explained_variance*100, 'CumPVTE': np.cumsum(explained_variance*100) },  index=generate_components_short_names(len(eigenvalues)))
+imp.to_csv('./outputs/csv/acp_imp.csv')
 
-
-
-
+imp
 
 
 
@@ -858,6 +956,10 @@ Metrics = ['test_recall', 'test_f1_micro', 'test_precision_micro', 'test_accurac
 
 Performances = {'#Indices': []}
 
+maxI = 0
+
+metricMax = 'test_accuracy'
+
 for i in range(len(Metrics)):
 
   Performances[Metrics[i]] = []
@@ -868,13 +970,23 @@ for i in range(len(Metrics)):
 
     Performances['#Indices'].append(Index[j])
 
+for i in range(len(Index)):
+
+  if Performances[metricMax][i] > Performances[metricMax][maxI]:
+
+    maxI = i
+
 es = pd.DataFrame(Performances,columns=Metrics, index=estimators_names)
+
+
 
 es.columns =  es.columns.str.capitalize()
 
 es.columns =  es.columns.str.replace('_', ' ')
 
 es['#Indice'] = Index
+
+es.to_csv('./outputs/csv/estimator_scores.csv')
 
 es
 
@@ -924,21 +1036,21 @@ with sns.axes_style("ticks"):
 
   plt.ylabel('Taux de VP')
 
-  plt.title('Courbe ROC')
+  title(plt,'Courbe ROC')
 
   plt.legend(loc="lower right")
 
   plt.show()
 
-  save_file(plt, 'roc_curve')
+  save_figure(plt, 'roc_curve')
 
 
 
-model = scores['estimator'][Index[1]]
+model = scores['estimator'][Index[maxI]]
 
-X_test = X.iloc[scores['indices']['test'][Index[1]]]
+X_test = X.iloc[scores['indices']['test'][Index[maxI]]]
 
-y_test = y.iloc[scores['indices']['test'][Index[1]]]
+y_test = y.iloc[scores['indices']['test'][Index[maxI]]]
 
 
 
@@ -968,7 +1080,7 @@ print("Classification Report:\n", class_report)
 
 
 
-group_names = ['TN','FP','FN','VP']
+group_names = ['VN','FP','FN','VP']
 
 group_counts = ["{0:0.0f}".format(value) for value in conf_matrix.flatten()]
 
@@ -1034,7 +1146,7 @@ pca = load('./outputs/models/pca.joblib')
 
 X_test = datasets[1][input_columns].iloc[1:10]
 
-X_test[input_columns] = scaler.transform(datasets[1][input_columns].iloc[1:10])
+X_test[pca_input_columns] = scaler.transform(datasets[1][pca_input_columns].iloc[1:10])
 
 X_test_r = pca.transform(X_test[pca_input_columns])
 

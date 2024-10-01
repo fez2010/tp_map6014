@@ -12,6 +12,8 @@ build: outputs/py/script.py
 	cp outputs/py/script.py .script.py
 	python .script.py
 	rm .script.py
+	cp -r outputs/images/* rapport/images
+	cp -r outputs/csv/ rapport/csv
 
 %.py: %.ipynb
 	jupyter nbconvert $<  --to python 
@@ -29,7 +31,7 @@ open: TP_MAP6009.ipynb
 	jupyter execute TP_MAP6009.ipynb --allow-errors
 TP_MAP6009.ipynb:
 	wget https://raw.githubusercontent.com/fez2010/tp_map6014/refs/heads/main/TP_MAP6009.ipynb
-clean: outputs/py/script.py
+clean: outputs/py/script.py rm outputs/txts/script.txt rm outputs/sh/script.sh
 	rm outputs/py/script.py
 	rm outputs/txts/script.txt
 	rm outputs/sh/script.sh
