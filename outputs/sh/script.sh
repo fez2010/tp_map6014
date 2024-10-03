@@ -1,4 +1,5 @@
 #!usr/bin/bash
+
 cat /etc/os-release
 
 pip install seaborn[stats]

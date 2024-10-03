@@ -47,3 +47,4 @@ Vous pouvez build le model, pdf...
 * [venv installations and kernel creation](https://medium.com/@WamiqRaza/how-to-create-virtual-environment-jupyter-kernel-python-6836b50f4bf4)
 * [Theme](./theme/AdobeColor-My%20Color%20Theme-3.jpeg)
 * [Latex](https://guides.nyu.edu/LaTeX/installation)
+* [Color Generator](https://color.adobe.com)

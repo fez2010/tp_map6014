@@ -1,0 +1,1 @@
+Industry,Profession,Traffic,Coach,Head_gender,Greywage,Way,Gender,Age,Stag,Novator,Anxiety,Selfcontrol,Independ,Extraversion,Wayencoded
