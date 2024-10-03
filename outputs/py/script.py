@@ -162,7 +162,7 @@ QUANTITATIVE_COLUMNS = ['Age','Stag','Novator','Anxiety','Selfcontrol','Independ
 
 REAL_QUANTITATIVE_COLUMNS = ['Stag', 'Novator','Anxiety','Selfcontrol','Independ','Extraversion']
 
-INTEGER_QUANTITATIVE_COLUMNS = ['Age']
+INTEGER_QUANTITATIVE_COLUMNS = ['Age', 'Wayencoded']
 
 # Liste des variables explicatives
 
@@ -266,7 +266,7 @@ with sns.axes_style("ticks"):
 
         multiple="stack",
 
-        palette=COLOR_PALETTE[0:1],
+        palette=COLOR_PALETTE[0:2],
 
         edgecolor=".3",
 
@@ -640,7 +640,7 @@ with sns.axes_style("ticks"):
 
   mask[mask.shape[0]-1][mask.shape[1]-1] = False
 
-  heatmap = sns.heatmap(no_outliers_2.corr(), mask=mask, vmin=-1, vmax=1, annot=True, cmap='BrBG')
+  heatmap = sns.heatmap(np.round(no_outliers_2.corr(),2), mask=mask, vmin=-1, vmax=1, annot=True, cmap='BrBG')
 
   heatmap.bbox_inches = 'with'
 
@@ -764,6 +764,8 @@ variable_names = ACP_dataset[EXPLICATIVES_COLUMNS].columns
 
 loadings = eigenvectors * np.sqrt(eigenvalues.reshape(-1, 1))
 
+print(loadings)
+
 with sns.axes_style("ticks"):
 
   # Créez un graphique de dispersion des contributions
@@ -808,13 +810,17 @@ with sns.axes_style("ticks"):
 
   plt.figure(figsize=(3.1, 3))
 
-  plt.bar(range(1, len(eigenvalues) + 1), explained_variance *100, alpha=0.5, align='center')
+  plt.plot(range(1, len(eigenvalues) + 1), explained_variance *100, alpha=0.7, marker='o', color='b', linestyle='--')
+
+  plt.xticks(np.arange(1, len(eigenvalues) + 1))
+
+  plt.xlabel('Composante Principale')
 
   plt.axhline(1, color='red', linestyle='--', label="Seuil de signifiance")
 
   plt.xlabel('Composante Principale')
 
-  plt.ylabel('Valeur Propre')
+  plt.ylabel('Variance expliquée')
 
   plt.grid(color='gray', linestyle='--', linewidth=0.5)
 
@@ -844,7 +850,59 @@ with sns.axes_style("ticks"):
 
   plt.show()
 
-imp = pd.DataFrame(data = { 'TVE': eigenvalues, 'PVTE': explained_variance*100, 'CumPVTE': np.cumsum(explained_variance*100) },  index=generate_components_short_names(len(eigenvalues)))
+  # Affichage du cercle des corrélations
+
+  plt.figure(figsize=(8, 8))
+
+  plt.title("Cercle des Corrélations")
+
+
+
+  for i, var in enumerate(variable_names):
+
+      x = components[0, i]
+
+      y = components[1, i]
+
+      plt.arrow(0, 0, x, y, head_width=0.1, head_length=0.1, label=var)
+
+  # Ajoutez les noms des variables
+
+  #for i, variable in enumerate(variable_names):
+
+     # plt.annotate(variable, (contributions[i, 0], contributions[i, 1]))
+
+
+
+  plt.xlim(-1, 1)
+
+  plt.ylim(-1, 1)
+
+  plt.xlabel("Composante Principale 1")
+
+  plt.ylabel("Composante Principale 2")
+
+  plt.axhline(0, color='black', linewidth=0.5)
+
+  plt.axvline(0, color='black', linewidth=0.5)
+
+  plt.grid(color='gray', linestyle='--', linewidth=0.5)
+
+  plt.legend(loc='upper right')
+
+  save_figure(plt, f'circle_of_correlation')
+
+  plt.show()
+
+
+
+imp = pd.DataFrame(data = { '|d(Vi-C1)|': np.round(np.absolute(components[:,0]),3), '|d(Vi-C2)|': np.round(np.absolute(components[:,1]),3) },  index=variable_names).sort_values(by=['|d(Vi-C1)|'], ascending=False)
+
+imp.to_csv('./outputs/csv/dist_component1and2_imp.csv')
+
+print( imp)
+
+imp = pd.DataFrame(data = { 'TVE': np.round(eigenvalues,2), 'PVTE': np.round(explained_variance*100,2), 'PCVTE': np.round(np.cumsum(explained_variance*100),2) },  index=generate_components_short_names(len(eigenvalues)))
 
 imp.to_csv('./outputs/csv/acp_imp.csv')
 
@@ -966,7 +1024,7 @@ for i in range(len(Metrics)):
 
   for j in range(len(Index)):
 
-    Performances[Metrics[i]].append(scores[Metrics[i]][Index[j]])
+    Performances[Metrics[i]].append(round(scores[Metrics[i]][Index[j]],2))
 
     Performances['#Indices'].append(Index[j])
 
@@ -1040,9 +1098,11 @@ with sns.axes_style("ticks"):
 
   plt.legend(loc="lower right")
 
+  save_figure(plt, 'roc_curve')
+
   plt.show()
 
-  save_figure(plt, 'roc_curve')
+
 
 
 
@@ -1097,6 +1157,8 @@ with sns.axes_style("ticks"):
   splot = sns.heatmap(conf_matrix, annot=labels, fmt='', cmap='Blues')
 
   save_figure(plt,'matrice_confusion_meilleur_estimateur')
+
+
 
 
 

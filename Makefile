@@ -31,7 +31,7 @@ open: TP_MAP6009.ipynb
 	jupyter execute TP_MAP6009.ipynb --allow-errors
 TP_MAP6009.ipynb:
 	wget https://raw.githubusercontent.com/fez2010/tp_map6014/refs/heads/main/TP_MAP6009.ipynb
-clean: outputs/py/script.py rm outputs/txts/script.txt rm outputs/sh/script.sh
+clean: outputs/py/script.py  outputs/txts/script.txt  outputs/sh/script.sh
 	rm outputs/py/script.py
 	rm outputs/txts/script.txt
 	rm outputs/sh/script.sh
