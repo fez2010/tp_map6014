@@ -12,13 +12,13 @@ Prédiction du risque de départ d'un employer a l'aide du dataset [turnover.csv
 - [Références](#references)
 ## Description du dataset
 INFORMATIONS SUR LES COLONNES LE DATASET
-• stag : Expérience (temps)
-• event : Rotation du personnel (démission de l'employé)
-• gender : Sexe de l'employé (femme (f) ou homme (m))
-• age : Âge de l'employé (année)
-• industry : Industrie de l'employé
-• profession : Profession de l'employé
-• traffic : Provenance de l'employé dans l'entreprise. Vous avez contacté l'entreprise directement
+* stag : Expérience (temps)
+* event : Rotation du personnel (démission de l'employé)
+* gender : Sexe de l'employé (femme (f) ou homme (m))
+* age : Âge de l'employé (année)
+* industry : Industrie de l'employé
+* profession : Profession de l'employé
+* traffic : Provenance de l'employé dans l'entreprise. Vous avez contacté l'entreprise directement
 (après avoir entendu parler de la publicité, en connaissant la marque de l'entreprise, etc.) -
 advert. Vous avez contacté l'entreprise directement sur la recommandation d'un ami - pas un
 employé de cette entreprise - recNErab. Vous avez contacté l'entreprise directement sur la
@@ -27,17 +27,17 @@ poste sur un site d'emploi - youjs. L'agence de recrutement vous a amené chez l
 KA. Invité par l'employeur, nous le connaissions avant l'emploi - friends. L'employeur vous a
 contacté sur la recommandation d'une personne qui vous connaît - rabrecNErab. L'employeur
 vous a trouvé grâce à votre CV sur le site d'emploi - empjs.
-• coach : Présence d'un coach (formation) pendant la période d'essai
-• head_gender : Sexe du responsable (superviseur)
-• greywage : Salaire qui ne semble pas déclaré aux autorités fiscales. Le terme "greywage" en
+* coach : Présence d'un coach (formation) pendant la période d'essai
+* head_gender : Sexe du responsable (superviseur)
+* greywage : Salaire qui ne semble pas déclaré aux autorités fiscales. Le terme "greywage" en
 Russie ou en Ukraine signifie que l'employeur (l'entreprise) paie juste un petit montant audessus
 du salaire déclaré (le salaire déclaré signifie le salaire minimum)
-• way : Mode de transport de l'employé
-• extraversion : Score d'extraversion
-• independ : Score d'indépendance
-• selfcontrol : Score de maîtrise de soi
-• anxiety : Score d'anxiété
-• novator : Score d'innovation
+* way : Mode de transport de l'employé
+* extraversion : Score d'extraversion
+* independ : Score d'indépendance
+* selfcontrol : Score de maîtrise de soi
+* anxiety : Score d'anxiété
+* novator : Score d'innovation
 ## Avant de Commencer le Travail
 ### Créer un environnement virtuel python
 `conda create --name tp_map6014 python=3.8`
