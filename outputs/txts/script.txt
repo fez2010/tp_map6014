@@ -274,7 +274,7 @@ with sns.axes_style("ticks"):
   mask = np.triu(np.ones_like(IQR_dataset.corr()))
   mask[0][0] = False
   mask[mask.shape[0]-1][mask.shape[1]-1] = False
-  heatmap = sns.heatmap(IQR_dataset.corr(), mask=mask, vmin=-1, vmax=1, annot=True, cmap='BrBG')
+  heatmap = sns.heatmap(np.round(IQR_dataset.corr(),2), mask=mask, vmin=-1, vmax=1, annot=True, cmap='BrBG')
   plt.tight_layout()
   plt.box(False)
   save_figure(plt, 'corr_heatmap_after_removing_outlier')

@@ -532,7 +532,7 @@ with sns.axes_style("ticks"):
 
   mask[mask.shape[0]-1][mask.shape[1]-1] = False
 
-  heatmap = sns.heatmap(IQR_dataset.corr(), mask=mask, vmin=-1, vmax=1, annot=True, cmap='BrBG')
+  heatmap = sns.heatmap(np.round(IQR_dataset.corr(),2), mask=mask, vmin=-1, vmax=1, annot=True, cmap='BrBG')
 
   plt.tight_layout()
 
